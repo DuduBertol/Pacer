@@ -19,6 +19,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
+//                if let token = stravaManager.accessToken {
                 if let token = stravaManager.accessToken {
                     Text("Autenticado no Strava!")
                         .font(.headline)
