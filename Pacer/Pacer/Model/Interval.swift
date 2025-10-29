@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 struct Interval: IntervalProtocol {
     let id: UUID = UUID()

@@ -18,9 +18,10 @@ struct IntervalWorkoutView: View {
         VStack(spacing: 20) {
             
             if vm.isFinished {
-                Text("🏁 Treino finalizado!")
+                Text("Treino Finalizado!")
                     .font(.title)
-            } else if vm.currentIntervalIndex < vm.intervals.count {
+            }
+            else if vm.currentIntervalIndex < vm.intervals.count {
                 let current = vm.intervals[vm.currentIntervalIndex]
                 
                 Text(current.name)
@@ -28,7 +29,6 @@ struct IntervalWorkoutView: View {
                 
                 Text(formatTime(current.duration - vm.elapsedTime))
                     .font(.system(size: 60, weight: .bold, design: .rounded))
-
             }
             
             HStack(spacing: 32) {
@@ -46,8 +46,7 @@ struct IntervalWorkoutView: View {
                 }
                 .alert("Encerrar treino?", isPresented: $showResetAlert) {
                     Button("Sim", role: .destructive) {
-                        vm.reset()
-                        dismiss()
+                        vm.finish()
                     }
                     Button("Cancelar", role: .cancel) {}
                 }
@@ -56,6 +55,9 @@ struct IntervalWorkoutView: View {
             .padding()
         }
         .padding()
+        .sheet(isPresented: $vm.isFinished) {
+            SummaryView(vm: vm)
+        }
     }
     
     func formatTime(_ time: TimeInterval) -> String {

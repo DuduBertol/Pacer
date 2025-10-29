@@ -10,7 +10,6 @@ import UserNotifications
 
 @main
 struct PacerApp: App {
-    @StateObject var vm = IntervalWorkoutViewModel()
     
     init() {
         configureNotifications()
@@ -18,7 +17,7 @@ struct PacerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            IntervalEditorView(vm: vm)
+            ContentView()
 //                .preferredColorScheme(.light)
         }
     }

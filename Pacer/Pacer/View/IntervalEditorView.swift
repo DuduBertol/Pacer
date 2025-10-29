@@ -43,6 +43,20 @@ struct IntervalEditorView: View {
                     EditButton()
                 }
                 
+                //Iniciar Button
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button{
+                        showingWorkout = true
+                    } label:{
+//                        Text(vm.isRunning ? "Retomar Treino" : "Iniciar Treino")
+//                            .padding(8)
+                        Image(systemName: vm.isRunning ? "pause" : "play")
+                    }
+//                    .buttonStyle(.borderedProminent)
+                    .disabled(vm.intervals.isEmpty)
+                }
+                
+                
                 //Plus Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu{
@@ -75,18 +89,6 @@ struct IntervalEditorView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                }
-                
-                //Iniciar Button
-                ToolbarItem(placement: .bottomBar) {
-                    Button{
-                        showingWorkout = true
-                    } label:{
-                        Text(vm.isRunning ? "Retomar Treino" : "Iniciar Treino")
-                            .padding(8)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(vm.intervals.isEmpty)
                 }
             }
             .sheet(isPresented: $showingWorkout) {

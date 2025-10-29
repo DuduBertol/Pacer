@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct OldContentView: View {
     @StateObject private var stravaManager = StravaManager()
     @State private var showLoginSheet = false
     

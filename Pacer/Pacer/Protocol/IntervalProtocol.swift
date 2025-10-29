@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 protocol IntervalProtocol: Identifiable {
     var id: UUID { get }

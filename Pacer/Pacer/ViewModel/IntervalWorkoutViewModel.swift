@@ -19,9 +19,14 @@ class IntervalWorkoutViewModel: ObservableObject {
     @Published var isRunning = false
     @Published var isFinished = false
     
+    
     private var startDate: Date?
     private var accumulatedTime: TimeInterval = 0
     private var timerCancellable: AnyCancellable?
+    
+    private var totalTime: TimeInterval = 0
+    @Published var totalTimeString: String = "00m00s"
+    
     
     // MARK: - Controle do treino
     func start() {
@@ -49,6 +54,17 @@ class IntervalWorkoutViewModel: ObservableObject {
         timerCancellable?.cancel()
     }
     
+    func finish() {
+        print(accumulatedTime)
+        print(elapsedTime)
+        
+        stop()
+        notifyIntervalChange(nil)
+        totalTimeString = String(format: "%02dm%02ds", Int(totalTime.truncatingRemainder(dividingBy: 3600)) / 60, Int(totalTime.truncatingRemainder(dividingBy: 60)))
+
+        isFinished = true        
+    }
+    
     private func tick() {
         guard let startDate, isRunning, currentIntervalIndex < intervals.count else { return }
         
@@ -57,6 +73,7 @@ class IntervalWorkoutViewModel: ObservableObject {
         elapsedTime = accumulatedTime + currentElapsed
         
         if elapsedTime >= intervals[currentIntervalIndex].duration {
+            totalTime += elapsedTime
             nextInterval()
         }
     }
@@ -70,9 +87,7 @@ class IntervalWorkoutViewModel: ObservableObject {
         if currentIntervalIndex < intervals.count {
             notifyIntervalChange(intervals[currentIntervalIndex])
         } else {
-            stop()
-            isFinished = true
-            notifyIntervalChange(nil)
+            finish()
         }
     }
     
