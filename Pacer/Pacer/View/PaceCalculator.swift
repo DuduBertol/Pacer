@@ -4,7 +4,6 @@
 //
 //  Created by Eduardo Bertol on 27/10/25.
 //
-
 import SwiftUI
 import Combine
 
@@ -16,34 +15,36 @@ struct PaceCalculator: View {
     @State var isOpenedMetersWheel: Bool = false
     
     var body: some View {
-        VStack{
-            Form{
-                Section("Field Size (m)"){
-                    Button{
-                        withAnimation{
+        VStack {
+            Form {
+                Section("Field Size (m)") {
+                    Button {
+                        withAnimation {
                             isOpenedMetersWheel.toggle()
                         }
                     } label: {
-                        HStack{
-                            Text("\(Int($vm.fieldSize.wrappedValue)) meters")
+                        HStack {
+                            Text("\(Int(vm.fieldSize)) meters")
+                                .foregroundColor(.primary)
                             Spacer()
                             Image(systemName: isOpenedMetersWheel ? "chevron.up" : "chevron.down")
+                                .foregroundColor(.accentColor)
                         }
                     }
+                    .buttonStyle(.plain)
                     
                     if isOpenedMetersWheel {
                         Picker("Field Size", selection: $vm.fieldSize) {
-                            ForEach(1..<1000){
-                                Text("\($0) m")
+                            ForEach(50..<1001, id: \.self) { meters in
+                                Text("\(meters) m").tag(Double(meters))
                             }
                         }
                         .pickerStyle(.wheel)
-                        .foregroundStyle(.red)
                     }
                 }
                 
-                Section("Elapsed Time"){
-                    HStack{
+                Section("Elapsed Time") {
+                    HStack {
                         Spacer()
                         Text(formatTime(vm.elapsedTime))
                             .font(.largeTitle)
@@ -53,10 +54,10 @@ struct PaceCalculator: View {
                     }
                 }
                 
-                Section("Pace (min/Km)"){
-                    HStack{
+                Section("Pace (min/Km)") {
+                    HStack {
                         Spacer()
-                        Text("\(formatTime($vm.pace.wrappedValue))")
+                        Text(formatTime(vm.pace * 60))
                             .font(.largeTitle)
                             .bold()
                             .multilineTextAlignment(.center)
@@ -64,13 +65,12 @@ struct PaceCalculator: View {
                     }
                 }
                 
-                
-                Section{
-                    Button{
+                Section {
+                    Button {
                         vm.calculatePace()
                         vm.newRound()
                     } label: {
-                        HStack{
+                        HStack {
                             Spacer()
                             Text("Volta")
                                 .font(.title)
@@ -80,16 +80,17 @@ struct PaceCalculator: View {
                     }
                     .buttonStyle(.borderedProminent)
                     
-                    Button{
+                    Button {
                         vm.stop()
                     } label: {
-                        HStack{
+                        HStack {
                             Spacer()
                             Text("Stop")
                                 .font(.caption)
                             Spacer()
                         }
                     }
+                    .tint(.red)
                 }
             }
         }
@@ -106,24 +107,18 @@ struct PaceCalculator: View {
     PaceCalculator()
 }
 
-
 class PaceCalculatorViewModel: ObservableObject {
     
-    @State var fieldSize: Double = 260 //meters
-    @Published var elapsedTime: TimeInterval = 0 //seconds
-
-    @State var pace: Double = 0
-    
+    @Published var fieldSize: Double = 260 // meters
+    @Published var elapsedTime: TimeInterval = 0 // seconds
+    @Published var pace: Double = 0 // minutes per km
     @Published var isRunning = false
     
-    
     private var startDate: Date?
-    private var accumulatedTime: TimeInterval = 0
     private var timerCancellable: AnyCancellable?
     
     private var totalTime: TimeInterval = 0
     @Published var totalTimeString: String = "00m00s"
-    
     
     // MARK: - Controle do treino
     func newRound() {
@@ -132,7 +127,7 @@ class PaceCalculatorViewModel: ObservableObject {
         isRunning = true
         startDate = Date()
         
-        timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
+        timerCancellable = Timer.publish(every: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 self?.tick()
@@ -150,17 +145,20 @@ class PaceCalculatorViewModel: ObservableObject {
         
         let currentElapsed = Date().timeIntervalSince(startDate)
         elapsedTime = currentElapsed
-        
-        totalTime += elapsedTime
     }
     
-    func calculatePace(){
-        let km: Double = 1000 / fieldSize
-        let minutes: Double = elapsedTime / 60
+    func calculatePace() {
+        // Distância em quilômetros
+        let distanceInKm = fieldSize / 1000.0
         
-        pace = minutes / km
-//        pace = (1000 / fieldSize) / (elapsedTime / 60)
+        // Tempo em minutos
+        let minutes = elapsedTime / 60.0
         
-        print("pace: \(pace)")
+        // Pace = minutos por quilômetro
+        pace = minutes / distanceInKm
+        
+        print("Distance: \(fieldSize)m (\(distanceInKm)km)")
+        print("Time: \(elapsedTime)s (\(minutes)min)")
+        print("Pace: \(pace) min/km")
     }
 }
